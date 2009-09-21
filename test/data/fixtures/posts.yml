@@ -1,0 +1,16 @@
+## Post fixtures
+---
+ferko_post_1:
+  title: my first post
+  content: hello, this is my first post !
+  user: ferko
+
+ferko_post_2:
+  title: a next post
+  content: I really like posting ... yeaaah
+  user: ferko
+
+janko_post_1:
+  title: disable fixtures released
+  content: the new rails plugin for disabling test fixtures has been released.
+  user: janko

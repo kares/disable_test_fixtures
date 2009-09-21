@@ -1,0 +1,26 @@
+## Comment fixtures
+---
+comment_1:
+  body: very nice.
+  user: ferko
+  post_id: <%= Fixtures.identify(:janko_post_1) %>
+
+comment_2:
+  body: woow ... who's that genius that did this ?
+  user: jozko
+  post_id: <%= Fixtures.identify(:janko_post_1) %>
+
+comment_3:
+  body: kares "the mighty"
+  user_id: <%= Fixtures.identify(:janko) %>
+  post: janko_post_1
+
+comment_4:
+  body: love him !
+  user: jozko
+  post: janko_post_1
+
+comment_5:
+  body: yeah, freaking awesome this is ...
+  user: ferko
+  post: janko_post_1

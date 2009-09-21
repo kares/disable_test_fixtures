@@ -1,0 +1,36 @@
+DisableTestFixtures
+===================
+
+Rails plugin that disables fixture loading during test setup.
+
+This is useful for those not really enjoying test fixtures and
+preferring a "factory" test pattern, but without extensive database 
+mocking (staying transactionaly connected in every test).
+
+
+Example
+=======
+
+class UserTest < ActiveSupport::TestCase
+
+  disable_fixtures_for :all
+
+  test "no 1 test" do
+    puts 'no 1 test'
+    pp User.all.inspect
+    User.create! :name => 'No 1'
+    assert_equal 1, User.count
+  end
+
+  test "no 2 test" do
+    puts 'no 2 test'
+    pp User.all.inspect
+    User.create! :name => 'No 2'
+    assert_equal 1, User.count
+  end
+
+end
+
+
+Copyright (c) 2009 Karol Bucek (http://blog.kares.org),
+released under the MIT license

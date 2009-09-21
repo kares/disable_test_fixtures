@@ -1,0 +1,13 @@
+## User fixtures
+---
+ferko:
+  name: Ferko Suska
+  email: ferko@suska.net
+
+janko:
+  name: Janko Cibulka
+  email: janko@cibulka.org
+
+jozko:
+  name: Jozko Hruska
+  email: jozko@hruska.com
