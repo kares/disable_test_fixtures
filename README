@@ -15,17 +15,8 @@ class UserTest < ActiveSupport::TestCase
 
   disable_fixtures_for :all
 
-  test "no 1 test" do
-    puts 'no 1 test'
-    pp User.all.inspect
-    User.create! :name => 'No 1'
-    assert_equal 1, User.count
-  end
-
-  test "no 2 test" do
-    puts 'no 2 test'
-    pp User.all.inspect
-    User.create! :name => 'No 2'
+  test "create a user" do
+    User.create! :name => 'Gregory House'
     assert_equal 1, User.count
   end
 
