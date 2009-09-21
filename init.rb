@@ -1,3 +1,2 @@
-require 'disable_test_fixtures'
-
-ActiveSupport::TestCase.send :include, DisableTestFixtures
+# NOTE: hook it up yourself in your test_helper with :
+# ActiveSupport::TestCase.send :include, DisableTestFixtures
