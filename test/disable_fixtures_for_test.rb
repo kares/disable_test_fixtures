@@ -32,6 +32,15 @@ class DisableFixturesForAllTest < ActiveSupport::TestCase
     assert_equal 0, Comment.all.size
   end
 
+  %W{User Post Comment}.each do |model|
+    test "no #{model.downcase}s found" do
+      clazz = Object.const_get(model.to_sym)
+      all_instances = clazz.find :all
+      #assert_equal Array, all_instances.class
+      assert_equal 0, all_instances.size
+    end
+  end
+
 end
 
 class DisableFixturesForRegexpTest < ActiveSupport::TestCase
@@ -50,11 +59,17 @@ class DisableFixturesForRegexpTest < ActiveSupport::TestCase
     assert_equal 5, Comment.all.size
   end
 
+  test "no users found" do
+    all_instances = User.find :all
+    #assert_equal Array, all_instances.class
+    assert_equal 0, all_instances.size
+  end
+
 end
 
 class DisableFixturesForArrayOfNamesTest < ActiveSupport::TestCase
 
-  disable_fixtures_for [ 'test_posts', 'test_comments' ]
+  disable_fixtures_for %W{test_posts test_comments}
 
   def test_users
     assert_equal 1, User.find_all_by_email('ferko@suska.net').size

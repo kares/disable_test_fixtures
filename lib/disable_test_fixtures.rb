@@ -69,13 +69,20 @@ module DisableTestFixtures
     self.class.fixtures_disabled?(_test_method_name)
   end
 
+  #def load_fixtures
+  #  puts "load_fixtures() ..."
+  #  super
+  #end
+
   def setup_fixtures
+    #puts "setup_fixtures() fixtures_disabled? = #{fixtures_disabled?}"
 
     unless fixtures_disabled?
       self.last_test_loaded_fixtures = true
       return super # default (real) setup_fixtures from TestFixtures
     end
 
+    #puts "setup_fixtures() last_test_loaded_fixtures? = #{last_test_loaded_fixtures?}"
     if last_test_loaded_fixtures?
       # need to reset all loaded fixtures - empty the tables :
       unless (loaded_fixtures = already_loaded_fixtures).blank?
@@ -113,6 +120,7 @@ module DisableTestFixtures
     connection = ActiveRecord::Base.connection
     connection.transaction(:requires_new => true) do
       already_loaded_fixtures.values.each do |loaded_fixtures|
+        next if loaded_fixtures.nil?
         loaded_fixtures.each_value do |fixtures|
           fixtures.delete_existing_fixtures
         end
