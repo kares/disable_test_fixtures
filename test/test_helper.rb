@@ -14,7 +14,7 @@ ActiveRecord::Base.configurations = { 'test' => {
 }} # when configurations are empty fixtures are not setup !
 ActiveRecord::Base.establish_connection('test')
 ActiveRecord::Base.silence do
-    load File.join(DATA_DIRECTORY, 'schema.rb')
+  load File.join(DATA_DIRECTORY, 'schema.rb')
 end
 
 require 'rails_setup' # makes test case load fixtures just like in rails
@@ -23,6 +23,7 @@ require 'data/models' # test active record model classes
 require File.join(File.dirname(__FILE__), '../lib/disable_test_fixtures')
 
 class ActiveSupport::TestCase
+
   include DisableTestFixtures
 
   #puts "#{DATA_DIRECTORY}/fixtures/"

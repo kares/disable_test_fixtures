@@ -1,13 +1,8 @@
 
-# TODO is it working with MiniTest ?!
-
 module DisableTestFixtures
 
   @@last_test_loaded_fixtures = nil
   mattr_accessor :last_test_loaded_fixtures
-
-  # internal flag whether MiniTest or plain-old TestUnit is being used
-  MINI_TEST = defined?(MiniTest::Assertions) && TestCase < MiniTest::Assertions
 
   def self.included(base)
     base.extend ClassMethods
@@ -66,7 +61,7 @@ module DisableTestFixtures
   end
 
   def fixtures_disabled?
-    self.class.fixtures_disabled?(_test_method_name)
+    self.class.fixtures_disabled?(method_name)
   end
 
   #def load_fixtures
@@ -152,28 +147,20 @@ module DisableTestFixtures
     DisableTestFixtures.last_test_loaded_fixtures = flag
   end
 
-  def _test_method_name
-    if DisableTestFixtures::MINI_TEST
-      self.send :__name__ # mini test required
-    else
-      instance_variable_get(:@method_name) # "classic" test unit
-    end
-  end
-
 end
 
-#ActiveSupport::TestCase.class_eval do
-#
-#  @@last_test_loaded_fixtures = true
-#  cattr_reader :last_test_loaded_fixtures
-#
-#  teardown :set_last_test_loaded_fixtures
-#
-#  private
-#
-#  def set_last_test_loaded_fixtures
-#    fixtures_disabled = respond_to?(:fixtures_disabled?) && fixtures_disabled?
-#    @@last_test_loaded_fixtures = ! fixtures_disabled # by default will be true
-#  end
-#
+# make sure we have a method_name method
+# NOTE: method_name is a attr_reader is Test::Unit::TestCase
+# + if ActiveSupport::TestCase is being used it takes care for
+# setting it up for MiniTest - thus this should happen rarely
+#unless respond_to?(:method_name)
+  # NOTE: minitest is auto-picked if ActiveSupport::TestCase is in use
+  #if defined?(MiniTest::Assertions) #&& TestCase < MiniTest::Assertions
+    #alias_method :method_name, :name if method_defined? :name
+    #alias_method :method_name, :__name__ if method_defined? :__name__
+  #else
+    #def method_name
+      #instance_variable_get(:@method_name) # "classic" test unit
+    #end
+  #end
 #end
