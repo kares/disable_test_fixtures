@@ -1,4 +1,6 @@
 
+#require 'active_support/module'
+
 module DisableTestFixtures
 
   @@last_test_loaded_fixtures = nil
@@ -15,12 +17,19 @@ module DisableTestFixtures
     # Array of strings/symbols - test names
     # Regexp - matching test names
     # Proc - will get test name passed
-    # :all
+    # the :all Symbol
     def disable_fixtures_for(tests = nil, &block)
       tests = tests.map { |e| e.to_s } if tests.is_a?(Array)
       tests = block if tests.nil? && block_given?
       @fixtures_disabled_tests = tests == :all ? true : tests
-      #self.instance_variable_set(:@fixtures_disabled_tests, tests == :all ? true : tests)
+      @fixtures_disabled_tests_negated = false
+      @fixtures_disabled_tests
+    end
+
+    def enable_fixtures_for(tests = nil, &block)
+      outcome = disable_fixtures_for(tests, &block)
+      @fixtures_disabled_tests_negated = true
+      outcome
     end
 
     # #deprecated
@@ -39,7 +48,7 @@ module DisableTestFixtures
         superclass.respond_to?(:fixtures_disabled?) ?
           superclass.fixtures_disabled?(test) : false
       else
-        case fixtures_disabled_tests
+        outcome = case fixtures_disabled_tests
           when String then
             test == fixtures_disabled_tests
           when Symbol then
@@ -47,14 +56,14 @@ module DisableTestFixtures
           when Regexp then
             !!(test =~ fixtures_disabled_tests)
           when Array then
-            #puts @fixtures_disabled_tests.inspect + ' : ' + test.inspect
-            return fixtures_disabled_tests.include?(test)
+            fixtures_disabled_tests.include?(test)
           when Proc then
             fixtures_disabled_tests.arity == 1 ?
               fixtures_disabled_tests.call(test) :
                 fixtures_disabled_tests.call
-          else !!fixtures_disabled_tests
+          else !! fixtures_disabled_tests
         end
+        @fixtures_disabled_tests_negated ? ! outcome : outcome
       end
     end
 
@@ -101,7 +110,7 @@ module DisableTestFixtures
 
   private
 
-  # TestFixtures internals !
+  # Rails 2.x TestFixtures internals !
   def already_loaded_fixtures
     begin
       ActiveRecord::TestFixtures.send(:class_variable_get, :@@already_loaded_fixtures)
@@ -110,7 +119,7 @@ module DisableTestFixtures
     end
   end
 
-  # TestFixtures internals !
+  # Rails 2.x TestFixtures internals !
   def clear_loaded_fixtures(already_loaded_fixtures)
     connection = ActiveRecord::Base.connection
     connection.transaction(:requires_new => true) do
@@ -148,19 +157,3 @@ module DisableTestFixtures
   end
 
 end
-
-# make sure we have a method_name method
-# NOTE: method_name is a attr_reader is Test::Unit::TestCase
-# + if ActiveSupport::TestCase is being used it takes care for
-# setting it up for MiniTest - thus this should happen rarely
-#unless respond_to?(:method_name)
-  # NOTE: minitest is auto-picked if ActiveSupport::TestCase is in use
-  #if defined?(MiniTest::Assertions) #&& TestCase < MiniTest::Assertions
-    #alias_method :method_name, :name if method_defined? :name
-    #alias_method :method_name, :__name__ if method_defined? :__name__
-  #else
-    #def method_name
-      #instance_variable_get(:@method_name) # "classic" test unit
-    #end
-  #end
-#end

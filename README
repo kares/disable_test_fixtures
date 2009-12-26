@@ -3,25 +3,74 @@ DisableTestFixtures
 
 Rails plugin that disables fixture loading during test setup.
 
-This is useful for those not really enjoying test fixtures and
-preferring a "factory" test pattern, but without extensive database 
-mocking (staying transactionaly connected in every test).
+Unit tests should be fast, active records (unless testing a complicated
+non data dependent business logic) should be connected to a database, but
+every time such a test method runs Rails will make sure Your fixtures are
+correctly loaded (and there's no way turning it off for particular tests).
 
+Until NOW ...
+
+If You don't use fixtures in Your test, turn them off easily.
 
 Example
 =======
 
 class UserTest < ActiveSupport::TestCase
+  include DisableTestFixtures
 
-  disable_fixtures_for :all
+  disable_fixtures_for %W{ test_create_a_user }
 
   test "create a user" do
     User.create! :name => 'Gregory House'
     assert_equal 1, User.count
   end
 
+  # other test methods that use fixtures
+  ...
+
 end
 
+Of course You might disable fixtures "globally" for all tests :
+
+test_helper.rb
+==============
+
+class ActiveSupport::TestCase
+  include DisableTestFixtures
+
+  disable_fixtures_for :all
+
+  # usual setup :
+  self.use_transactional_fixtures = true
+  self.use_instantiated_fixtures  = false
+  ...
+
+end
+
+If You have several existing test cases that use fixtures You might enable
+the fixtures support "back" for those depending on it.
+
+Example
+=======
+
+class FixturesDependentTest < ActiveSupport::TestCase
+
+  # assuming we disabled fixtures in test_helper.rb
+
+  enable_fixtures_for :all
+  ...
+
+end
+
+Your test will be faster and more readable if You don't use fixtures ...
+Try the factory pattern for creating the data You need in every scenario.
+
+http://www.dcmanges.com/blog/38
+http://textmode.at/2008/6/12/factory-girl-rails-fixture-replacement
+
+NOTE: BE CAREFULL WHEN MIXING TESTS THAT EXPECT AN EMPTY DB WITH FIXTURE
+DEPENDENT TESTS, YOU MIGHT NEED TO MAKE SURE YOUR DB IS CLEAN BEFORE EACH
+AND EVERY RUN (NO JUNK LEFT FROM A FIXTURE TEST FAILURE).
 
 Copyright (c) 2009 Karol Bucek (http://blog.kares.org),
 released under the MIT license

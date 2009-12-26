@@ -8,7 +8,7 @@ require 'action_view'
 
 DATA_DIRECTORY = File.join(File.dirname(__FILE__), 'data')
 
-ActiveRecord::Migration.verbose = false   # Quiet down the migration engine
+ActiveRecord::Migration.verbose = false # quiet down the migration engine
 ActiveRecord::Base.configurations = { 'test' => {
     'adapter' => 'sqlite3', 'database' => ':memory:'
 }} # when configurations are empty fixtures are not setup !
@@ -26,7 +26,6 @@ class ActiveSupport::TestCase
 
   include DisableTestFixtures
 
-  #puts "#{DATA_DIRECTORY}/fixtures/"
   self.fixture_path = "#{DATA_DIRECTORY}/fixtures/"
 
   # Transactional fixtures accelerate your tests by wrapping each test method
