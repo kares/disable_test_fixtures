@@ -2,6 +2,7 @@ DisableTestFixtures
 ===================
 
 Rails plugin that disables fixture loading during test setup.
+Tested with the built-in Test::Unit as well as with MiniTest.
 
 Unit tests should be fast, active records (unless testing a complicated
 non data dependent business logic) should be connected to a database, but
@@ -10,7 +11,7 @@ correctly loaded (and there's no way turning it off for particular tests).
 
 Until NOW ...
 
-If You don't use fixtures in Your test, turn them off easily.
+If You don't use fixtures in Your test, You might turn them off easily.
 
 Example
 =======
@@ -30,7 +31,7 @@ class UserTest < ActiveSupport::TestCase
 
 end
 
-Of course You might disable fixtures "globally" for all tests :
+Of course, You might disable fixtures "globally" for all tests.
 
 test_helper.rb
 ==============
@@ -47,8 +48,8 @@ class ActiveSupport::TestCase
 
 end
 
-If You have several existing test cases that use fixtures You might enable
-the fixtures support "back" for those depending on it.
+If You have existing test cases that use fixtures You might enable the
+fixtures support "back" only for those depending on it.
 
 Example
 =======
@@ -68,9 +69,10 @@ Try the factory pattern for creating the data You need in every scenario.
 http://www.dcmanges.com/blog/38
 http://textmode.at/2008/6/12/factory-girl-rails-fixture-replacement
 
-NOTE: BE CAREFULL WHEN MIXING TESTS THAT EXPECT AN EMPTY DB WITH FIXTURE
-DEPENDENT TESTS, YOU MIGHT NEED TO MAKE SURE YOUR DB IS CLEAN BEFORE EACH
-AND EVERY RUN (NO JUNK LEFT FROM A FIXTURE TEST FAILURE).
+NOTE: BE CAREFULL WHEN MIXING TESTS THAT EXPECT AN EMPTY DB WITH TESTS THAT
+DEPEND ON FIXTURES, YOU MIGHT NEED TO MAKE SURE YOUR DB IS CLEAN BEFORE EACH
+AND EVERY CONSECUTIVE RUN (NO FIXTURES LEFT FROM A PREVIOUS TEST FAILURE).
 
-Copyright (c) 2009 Karol Bucek (http://blog.kares.org),
-released under the MIT license
+http://blog.kares.org/search/label/disable_test_fixtures
+
+Copyright (c) 2009 Karol Bucek, released under the MIT license
