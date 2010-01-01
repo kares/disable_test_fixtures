@@ -1,5 +1,5 @@
 
-#require 'active_support/module'
+require 'active_support/core_ext/module'
 
 module DisableTestFixtures
 
@@ -12,12 +12,17 @@ module DisableTestFixtures
 
   module ClassMethods
 
-    # accepts :
-    # String/Symbol - test name
-    # Array of strings/symbols - test names
-    # Regexp - matching test names
-    # Proc - will get test name passed
-    # the :all Symbol
+    # Disables fixtures for the particular tests in this test case, accepts :
+    #
+    #  String/Symbol - test name
+    #  Array of strings/symbols - test names
+    #  Regexp - matching test names
+    #  Proc - will get test name passed
+    #  :all symbol
+    #
+    # NOTE: fixture disabling is inherited thru the inheritance chain
+    # thus if You've disabled them in super (e.g. ActiveSupport::TestCase)
+    # there's no need to disable them again.
     def disable_fixtures_for(tests = nil, &block)
       tests = tests.map { |e| e.to_s } if tests.is_a?(Array)
       tests = block if tests.nil? && block_given?
@@ -26,6 +31,11 @@ module DisableTestFixtures
       @fixtures_disabled_tests
     end
 
+    # The opposite of #disable_fixtures_for.
+    # 
+    # NOTE: fixture disabling is inherited thru the inheritance chain
+    # thus if You've disabled them in super (e.g. ActiveSupport::TestCase)
+    # there's no need to disable them again.
     def enable_fixtures_for(tests = nil, &block)
       outcome = disable_fixtures_for(tests, &block)
       @fixtures_disabled_tests_negated = true
