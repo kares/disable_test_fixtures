@@ -2,7 +2,7 @@ DisableTestFixtures
 ===================
 
 Rails plugin that disables fixture loading during test setup.
-Tested with the built-in Test::Unit as well as with MiniTest.
+Tested with the built-in *Test::Unit* as well as with *MiniTest*.
 
 Unit tests should be fast, active records (unless testing a complicated
 non data dependent business logic) should be connected to a database, but
@@ -11,57 +11,61 @@ correctly loaded (and there's no way turning it off for particular tests).
 
 Until NOW ...
 
-If You don't use fixtures in Your test, You might turn them off easily.
+If You don't need fixtures in a test, You might turn them off easily.
+
+
+Install
+=======
+
+    script/plugin install http://github.com/kares/disable_test_fixtures
+
 
 Example
 =======
 
-class UserTest < ActiveSupport::TestCase
-  include DisableTestFixtures
+    class UserTest < ActiveSupport::TestCase
+      include DisableTestFixtures
 
-  disable_fixtures_for %W{ test_create_a_user }
+      disable_fixtures_for %W{ test_create_a_user }
 
-  test "create a user" do
-    User.create! :name => 'Gregory House'
-    assert_equal 1, User.count
-  end
+      test "create a user" do
+        User.create! :name => 'Gregory House'
+        assert_equal 1, User.count
+      end
 
-  # other test methods that use fixtures
-  ...
+      # other test methods that use fixtures
+      ...
 
-end
+    end
 
-Of course, You might disable fixtures "globally" for all tests.
+Of course, You might disable fixtures "globally" for all tests :
 
-test_helper.rb
-==============
+    # test_helper.rb
 
-class ActiveSupport::TestCase
-  include DisableTestFixtures
+    class ActiveSupport::TestCase
+      include DisableTestFixtures
 
-  disable_fixtures_for :all
+      disable_fixtures_for :all
 
-  # usual setup :
-  self.use_transactional_fixtures = true
-  self.use_instantiated_fixtures  = false
-  ...
+      # usual setup :
+      self.use_transactional_fixtures = true
+      self.use_instantiated_fixtures  = false
+      ...
 
-end
+    end
 
-If You have existing test cases that use fixtures You might enable the
-fixtures support "back" only for those depending on it.
+If You have existing test cases that depend on fixtures You might enable the
+fixtures support "back" in the concrete test cases :
 
-Example
-=======
+    class FixturesDependentTest < ActiveSupport::TestCase
 
-class FixturesDependentTest < ActiveSupport::TestCase
+      # assuming fixtures were disabled in test_helper.rb
 
-  # assuming we disabled fixtures in test_helper.rb
+      enable_fixtures_for :all
+      ...
 
-  enable_fixtures_for :all
-  ...
+    end
 
-end
 
 Your test will be faster and more readable if You don't use fixtures ...
 Try the factory pattern for creating the data You need in every scenario.
