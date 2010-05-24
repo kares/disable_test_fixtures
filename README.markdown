@@ -78,5 +78,3 @@ DEPEND ON FIXTURES, YOU MIGHT NEED TO MAKE SURE YOUR DB IS CLEAN BEFORE EACH
 AND EVERY CONSECUTIVE RUN (NO FIXTURES LEFT FROM A PREVIOUS TEST FAILURE).
 
 http://blog.kares.org/search/label/disable_test_fixtures
-
-Copyright (c) 2009 Karol Bucek, released under the MIT license
