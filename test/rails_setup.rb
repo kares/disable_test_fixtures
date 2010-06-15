@@ -29,6 +29,10 @@ puts "emulating Rails.version = #{version = Rails::VERSION::STRING}"
 
 require 'active_support'
 require 'active_support/test_case'
+if version >= '3.0.0'
+  # otherwise require 'active_record/fixtures' fails in 3.0.0.beta4 !
+  require 'active_support/core_ext/class/delegating_attributes'
+end
 
 require 'active_record'
 require 'active_record/fixtures'
