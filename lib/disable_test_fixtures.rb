@@ -83,11 +83,6 @@ module DisableTestFixtures
     self.class.fixtures_disabled?(method_name)
   end
 
-  #def load_fixtures
-  #  puts "load_fixtures() ..."
-  #  super
-  #end
-
   def setup_fixtures
     #puts "setup_fixtures() fixtures_disabled? = #{fixtures_disabled?}"
 
@@ -108,10 +103,11 @@ module DisableTestFixtures
     @fixture_cache = {} # fixture helpers should work and return nothing
 
     # begin transaction :
-    if run_in_transaction?
-      ActiveRecord::Base.connection.increment_open_transactions
-      ActiveRecord::Base.connection.transaction_joinable = false
-      ActiveRecord::Base.connection.begin_db_transaction
+    if use_transactional_fixtures? #run_in_transaction?
+      connection = ActiveRecord::Base.connection
+      connection.increment_open_transactions
+      connection.transaction_joinable = false if connection.respond_to?(:transaction_joinable=)
+      connection.begin_db_transaction
     else
       Fixtures.reset_cache # just to be sure ...
     end
@@ -120,50 +116,50 @@ module DisableTestFixtures
 
   private
 
-  # Rails 2.x TestFixtures internals !
-  def already_loaded_fixtures
-    begin
-      ActiveRecord::TestFixtures.send(:class_variable_get, :@@already_loaded_fixtures)
-    rescue NameError # might get here on first run in single test
-      nil #{ self.class => {} }
-    end
-  end
-
-  # Rails 2.x TestFixtures internals !
-  def clear_loaded_fixtures(already_loaded_fixtures)
-    connection = ActiveRecord::Base.connection
-    connection.transaction(:requires_new => true) do
-      already_loaded_fixtures.values.each do |loaded_fixtures|
-        next if loaded_fixtures.nil?
-        loaded_fixtures.each_value do |fixtures|
-          fixtures.delete_existing_fixtures
-        end
-      end
-      #already_loaded_fixtures.values.each do |fixtures|
-      #  fixtures.delete_existing_fixtures
-      #end
-      ##end
-      ##
-      # Cap primary key sequences to max(pk).
-      if connection.respond_to?(:reset_pk_sequence!)
-        fixture_table_names.each do |table_name|
-          connection.reset_pk_sequence!(table_name)
-        end
+    # Rails 2.x TestFixtures internals !
+    def already_loaded_fixtures
+      begin
+        self.class.send(:class_variable_get, :@@already_loaded_fixtures)
+      rescue NameError # might get here on first run in a single test
+        nil #{ self.class => {} }
       end
     end
 
-    already_loaded_fixtures.clear
-    Fixtures.reset_cache # required to not break when multiple tests are run
-  end
+    # Rails 2.x TestFixtures internals !
+    def clear_loaded_fixtures(already_loaded_fixtures)
+      connection = ActiveRecord::Base.connection
+      connection.transaction(:requires_new => true) do
+        already_loaded_fixtures.values.each do |loaded_fixtures|
+          next if loaded_fixtures.nil?
+          loaded_fixtures.each_value do |fixtures|
+            fixtures.delete_existing_fixtures
+          end
+        end
+        #already_loaded_fixtures.values.each do |fixtures|
+        #  fixtures.delete_existing_fixtures
+        #end
+        ##end
+        ##
+        # Cap primary key sequences to max(pk).
+        if connection.respond_to?(:reset_pk_sequence!)
+          fixture_table_names.each do |table_name|
+            connection.reset_pk_sequence!(table_name)
+          end
+        end
+      end
 
-  #
+      already_loaded_fixtures.clear
+      Fixtures.reset_cache # required to not break when multiple tests are run
+    end
 
-  def last_test_loaded_fixtures?
-    DisableTestFixtures.last_test_loaded_fixtures
-  end
+    #
 
-  def last_test_loaded_fixtures=(flag)
-    DisableTestFixtures.last_test_loaded_fixtures = flag
-  end
+    def last_test_loaded_fixtures?
+      DisableTestFixtures.last_test_loaded_fixtures
+    end
+
+    def last_test_loaded_fixtures=(flag)
+      DisableTestFixtures.last_test_loaded_fixtures = flag
+    end
 
 end

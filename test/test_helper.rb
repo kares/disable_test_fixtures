@@ -1,12 +1,10 @@
 require 'rubygems'
-require 'active_support'
-require 'active_support/test_case'
+require 'test/unit'
 
-require 'active_record'
-require 'action_controller'
-require 'action_view'
+DATA_DIR = File.join(File.dirname(__FILE__), 'data')
+FIXTURES_ROOT = File.join(DATA_DIR, 'fixtures')
 
-DATA_DIRECTORY = File.join(File.dirname(__FILE__), 'data')
+require File.join(File.dirname(__FILE__), 'rails_setup')
 
 ActiveRecord::Migration.verbose = false # quiet down the migration engine
 ActiveRecord::Base.configurations = { 'test' => {
@@ -14,19 +12,19 @@ ActiveRecord::Base.configurations = { 'test' => {
 }} # when configurations are empty fixtures are not setup !
 ActiveRecord::Base.establish_connection('test')
 ActiveRecord::Base.silence do
-  load File.join(DATA_DIRECTORY, 'schema.rb')
+  load File.join(DATA_DIR, 'schema.rb')
 end
 
-require 'rails_setup' # makes test case load fixtures just like in rails
 require 'data/models' # test active record model classes
 
-require File.join(File.dirname(__FILE__), '../lib/disable_test_fixtures')
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '../lib')
+require 'disable_test_fixtures'
 
 class ActiveSupport::TestCase
 
   include DisableTestFixtures
 
-  self.fixture_path = "#{DATA_DIRECTORY}/fixtures/"
+  self.fixture_path = FIXTURES_ROOT
 
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
