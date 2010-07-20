@@ -71,10 +71,11 @@ Your test will be faster and more readable if You don't use fixtures ...
 Try the factory pattern for creating the data You need in every scenario.
 
 [Test Factory](http://www.dcmanges.com/blog/38)
+
 [Factory Girl](http://textmode.at/2008/6/12/factory-girl-rails-fixture-replacement)
 
 NOTE: BE CAREFULL WHEN MIXING TESTS THAT EXPECT AN EMPTY DB WITH TESTS THAT
 DEPEND ON FIXTURES, YOU MIGHT NEED TO MAKE SURE YOUR DB IS CLEAN BEFORE EACH
 AND EVERY CONSECUTIVE RUN (NO FIXTURES LEFT FROM A PREVIOUS TEST FAILURE).
 
-(http://blog.kares.org/search/label/disable_test_fixtures)
+[http://blog.kares.org/search/label/disable_test_fixtures](http://blog.kares.org/search/label/disable_test_fixtures)
