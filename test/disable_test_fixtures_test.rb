@@ -1,10 +1,5 @@
 
-require 'rubygems'
-#require 'active_support'
-require 'active_support/core_ext/module'
-require 'test/unit'
-
-require File.join(File.dirname(__FILE__), '../lib/disable_test_fixtures')
+require 'disable_test_fixtures'
 
 class DisableTestFixturesTest < Test::Unit::TestCase
 
