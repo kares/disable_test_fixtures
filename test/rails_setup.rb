@@ -45,11 +45,59 @@ require 'action_controller/integration' if version < '3.0.0'
 #require 'action_view/test_case'
 #require 'action_mailer/test_case'
 
-# the following is based on test_help.rb from rails :
-
 # Make double-sure the RAILS_ENV is set to test,
 # so fixtures are loaded to the right database
 silence_warnings { RAILS_ENV = "test" }
+silence_warnings { RAILS_ROOT = File.dirname(__FILE__) }
+
+module Rails
+  class << self
+
+    def initialized?
+      @initialized || false
+    end
+
+    def initialized=(initialized)
+      @initialized ||= initialized
+    end
+
+    def logger
+      if defined?(RAILS_DEFAULT_LOGGER)
+        RAILS_DEFAULT_LOGGER
+      else
+        nil
+      end
+    end
+
+    def backtrace_cleaner
+      @@backtrace_cleaner ||= begin
+        require 'rails/gem_dependency' # backtrace_cleaner depends on this !
+        require 'rails/backtrace_cleaner'
+        Rails::BacktraceCleaner.new
+      end
+    end
+
+    def root
+      Pathname.new(RAILS_ROOT) if defined?(RAILS_ROOT)
+    end
+
+    def env
+      @_env ||= ActiveSupport::StringInquirer.new(RAILS_ENV)
+    end
+
+    def version
+      VERSION::STRING
+    end
+
+    def public_path
+      @@public_path ||= self.root ? File.join(self.root, "public") : "public"
+    end
+
+    def public_path=(path)
+      @@public_path = path
+    end
+  end
+end
 
 class ActiveSupport::TestCase
   # only if defined e.g. Rails 2.2.3 monkey patches Test::Unit::TestCase :
