@@ -7,18 +7,27 @@ FIXTURES_ROOT = File.join(DATA_DIR, 'fixtures')
 require File.join(File.dirname(__FILE__), 'rails_setup')
 
 ActiveRecord::Migration.verbose = false # quiet down the migration engine
-ActiveRecord::Base.configurations = { 'test' => {
-    'adapter' => 'sqlite3', 'database' => ':memory:'
-}} # when configurations are empty fixtures are not setup !
+
+db =
+  if ARGV.find { |opt| /DB=([\d\.]+)/ =~ opt }
+    $~[1] # rake test DB=mysql
+  else
+    ENV['DB']
+  end || 'sqlite3'
+
+load File.join(File.dirname(__FILE__), 'db', "#{db}_config.rb")
+
 ActiveRecord::Base.establish_connection('test')
 ActiveRecord::Base.silence do
   load File.join(DATA_DIR, 'schema.rb')
 end
 
-require 'data/models' # test active record model classes
+require File.join(File.dirname(__FILE__), 'data/models')
 
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '../lib')
 require 'disable_test_fixtures'
+
+Fixtures = ActiveRecord::Fixtures unless defined?(Fixtures) # used in .ymls
 
 class ActiveSupport::TestCase
 

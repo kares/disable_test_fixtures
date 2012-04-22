@@ -1,23 +1,20 @@
 require 'rake'
-require 'rake/testtask'
-require 'rake/rdoctask'
 
-desc 'Default: run unit tests.'
 task :default => :test
 
-desc 'Test the disable_test_fixtures plugin.'
+require 'rake/testtask'
+desc 'Run Unit Tests'
 Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.libs << 'test'
   t.pattern = 'test/**/*_test.rb'
   t.verbose = true
 end
 
-desc 'Generate documentation for the disable_test_fixtures plugin.'
+require 'rdoc/task'
+desc 'Generate Documentation'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title    = 'DisableTestFixtures'
   rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+  #rdoc.rdoc_files.include('README.md')
+  #rdoc.rdoc_files.include('lib/**/*.rb')
 end

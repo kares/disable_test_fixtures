@@ -79,19 +79,18 @@ module DisableTestFixtures
 
   end
 
+  Fixtures = defined?(ActiveRecord::Fixtures) ? ActiveRecord::Fixtures : Fixtures
+  
   def fixtures_disabled?
     self.class.fixtures_disabled?(method_name)
   end
 
   def setup_fixtures
-    #puts "setup_fixtures() fixtures_disabled? = #{fixtures_disabled?}"
-
     unless fixtures_disabled?
       self.last_test_loaded_fixtures = true
       return super # default (real) setup_fixtures from TestFixtures
     end
 
-    #puts "setup_fixtures() last_test_loaded_fixtures? = #{last_test_loaded_fixtures?}"
     if last_test_loaded_fixtures?
       # need to reset all loaded fixtures - empty the tables :
       unless (loaded_fixtures = already_loaded_fixtures).blank?
@@ -101,22 +100,31 @@ module DisableTestFixtures
 
     self.last_test_loaded_fixtures = false
     @fixture_cache = {} # fixture helpers should work and return nothing
+    @fixture_connections = [] if enlist = respond_to?(:enlist_fixture_connections)
 
     # begin transaction :
     if use_transactional_fixtures? #run_in_transaction?
-      connection = ActiveRecord::Base.connection
-      connection.increment_open_transactions
-      connection.transaction_joinable = false if connection.respond_to?(:transaction_joinable=)
-      connection.begin_db_transaction
+      if enlist
+        @fixture_connections = enlist_fixture_connections
+        @fixture_connections.each do |connection|
+          connection.increment_open_transactions
+          connection.transaction_joinable = false
+          connection.begin_db_transaction
+        end
+      else
+        connection = ActiveRecord::Base.connection
+        connection.increment_open_transactions
+        connection.transaction_joinable = false if connection.respond_to?(:transaction_joinable=)
+        connection.begin_db_transaction
+      end
     else
       Fixtures.reset_cache # just to be sure ...
     end
-    
   end
 
   private
 
-    # Rails 2.x TestFixtures internals !
+    # Rails TestFixtures internals !
     def already_loaded_fixtures
       begin
         self.class.send(:class_variable_get, :@@already_loaded_fixtures)
@@ -125,21 +133,23 @@ module DisableTestFixtures
       end
     end
 
-    # Rails 2.x TestFixtures internals !
+    # Rails TestFixtures internals !
     def clear_loaded_fixtures(already_loaded_fixtures)
       connection = ActiveRecord::Base.connection
       connection.transaction(:requires_new => true) do
         already_loaded_fixtures.values.each do |loaded_fixtures|
           next if loaded_fixtures.nil?
           loaded_fixtures.each_value do |fixtures|
-            fixtures.delete_existing_fixtures
+            if fixtures.respond_to?(:delete_existing_fixtures)
+              fixtures.delete_existing_fixtures
+            else
+              fixtures.table_rows.keys.each do |table|
+                connection.delete "DELETE FROM #{connection.quote_table_name(table)}", 'Fixture Delete'
+              end
+              
+            end
           end
         end
-        #already_loaded_fixtures.values.each do |fixtures|
-        #  fixtures.delete_existing_fixtures
-        #end
-        ##end
-        ##
         # Cap primary key sequences to max(pk).
         if connection.respond_to?(:reset_pk_sequence!)
           fixture_table_names.each do |table_name|

@@ -13,11 +13,18 @@ Until NOW ...
 
 If You don't need fixtures in a test, You might turn them off easily.
 
+NOTE: The plugin assumes transactional fixtures are being used - it can't
+really help with instantiated fixture data !
+
 
 Install
 =======
 
-    script/plugin install http://github.com/kares/disable_test_fixtures
+    gem 'disable_test_fixtures'
+
+or as a plain-old rails plugin :
+
+    script/plugin install git://github.com/kares/disable_test_fixtures.git
 
 
 Example
@@ -67,15 +74,28 @@ fixtures support "back" in the concrete test cases :
     end
 
 
+Sample speed improvement running a single test case from a fixture based setup
+with fixtures disabled :
+
+    Finished in 12.705094 seconds.
+
+    49 tests, 200 assertions, 0 failures, 0 errors
+
+
+    Finished in 3.015264 seconds.
+
+    49 tests, 200 assertions, 0 failures, 0 errors
+
+
 Your test will be faster and more readable if You don't use fixtures ...
 Try the factory pattern for creating the data You need in every scenario.
 
 [Test Factory](http://www.dcmanges.com/blog/38)
 
-[Factory Girl](http://textmode.at/2008/6/12/factory-girl-rails-fixture-replacement)
+[Factory Girl](http://github.com/thoughtbot/factory_girl)
 
-NOTE: BE CAREFULL WHEN MIXING TESTS THAT EXPECT AN EMPTY DB WITH TESTS THAT
+NOTE: BE CAREFUL WHEN MIXING TESTS THAT EXPECT AN EMPTY DB WITH TESTS THAT
 DEPEND ON FIXTURES, YOU MIGHT NEED TO MAKE SURE YOUR DB IS CLEAN BEFORE EACH
 AND EVERY CONSECUTIVE RUN (NO FIXTURES LEFT FROM A PREVIOUS TEST FAILURE).
 
-[http://blog.kares.org/search/label/disable_test_fixtures](http://blog.kares.org/search/label/disable_test_fixtures)
+<http://blog.kares.org/search/label/disable_test_fixtures>

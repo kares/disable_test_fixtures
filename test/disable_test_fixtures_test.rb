@@ -1,4 +1,4 @@
-
+require File.expand_path('test_helper', File.dirname(__FILE__))
 require 'disable_test_fixtures'
 
 class DisableTestFixturesTest < Test::Unit::TestCase
